@@ -52,10 +52,6 @@ def test_valid_verified_email_result_details(valid_verified_email):
     assert valid_verified_email.result_details == 'No additional details'
 
 
-def test_valid_verified_email_execution_time(valid_verified_email):
-    assert valid_verified_email.execution_time == 0.5
-
-
 def test_invalid_verified_email_result_code(invalid_verified_email):
     assert invalid_verified_email.result_code == 1
 

@@ -86,11 +86,3 @@ class VerifiedEmail:
         :return: str
         """
         return RESULT_DETAILS_CODES[self.result_details_code]
-
-    @property
-    def execution_time(self):
-        """
-        Return a verification execution time in seconds.
-        :return: float
-        """
-        return self._resp['execution_time']
