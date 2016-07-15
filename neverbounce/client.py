@@ -1,11 +1,14 @@
 import requests
 
-from neverbounce.exceptions import AccessTokenExpired, NeverBounceAPIError
+from .exceptions import AccessTokenExpired, NeverBounceAPIError
 from .verified_email import VerifiedEmail
 from .account import Account
 
 
 class NeverBounce:
+    """
+    NeverBounce API client class used to verify an email address in realtime, check the account status, etc.
+    """
     def __init__(self, api_username, api_key, base_url='https://api.neverbounce.com/v3'):
         self.api_username = api_username
         self.api_key = api_key
@@ -14,25 +17,25 @@ class NeverBounce:
 
     def verify_single(self, email):
         """
-        Verify a single email and return VerifiedEmail object.
-        :param email:
-        :return: VerifiedEmail
+        Verify a single email address.
+        :param str email: Email address to verify.
+        :return: A VerifiedEmail object.
         """
         resp = self._call('single', {'email': email})
         return VerifiedEmail(email, resp)
 
     def account(self):
         """
-        Check the balance of credits in an account and see how many jobs are currently running.
-        :return: Account
+        Check the API account details like balance of credits.
+        :return: An Account object.
         """
         resp = self._call('account')
         return Account(resp)
 
     def get_access_token(self):
         """
-        Retrieve access token to authenticate API calls.
-        :return: access_token
+        Retrieve an access token to authenticate subsequential API calls.
+        :return: An access token string.
         """
         if self._access_token:
             return self._access_token
@@ -45,6 +48,12 @@ class NeverBounce:
         return self._access_token
 
     def _call(self, endpoint, data={}):
+        """
+        Make an authorized API call to specified endpoint.
+        :param str endpoint: API endpoint's relative URL, eg. `/account`.
+        :param dict data: POST request data.
+        :return: A dictionary with response data.
+        """
         try:
             data['access_token'] = self.get_access_token()
             return self._request(endpoint, data)
@@ -55,11 +64,11 @@ class NeverBounce:
 
     def _request(self, endpoint, data, auth=None):
         """
-        Make HTTP POST request to an API endpoint. Return response dictionary on success.
-        :param endpoint: str
-        :param data: dict
-        :param auth: tuple | None
-        :return: dict
+        Make HTTP POST request to an API endpoint.
+        :param str endpoint: API endpoint's relative URL, eg. `/account`.
+        :param dict data: POST request data.
+        :param tuple auth: HTTP basic auth credentials.
+        :return: A dictionary with response data.
         """
         url = '{}/{}'.format(self.base_url, endpoint)
         response = requests.post(url, data, auth=auth)
@@ -67,10 +76,10 @@ class NeverBounce:
 
     def _handle_response(self, response):
         """
-        Handle the response, HTTP errors, API failure messages, expired token.
-        Return response dictionary on success.
-        :param response: requests.Response
-        :return: dict
+        Handle the response and possible failures.
+        :param dict response: Response data.
+        :return: A dictionary with response data.
+        :raises: NeverBounceAPIError if the API call fails.
         """
         if not response.ok:
             raise NeverBounceAPIError(response)

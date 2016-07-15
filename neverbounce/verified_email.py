@@ -8,81 +8,79 @@ RESULT_DETAILS_CODES = (
 
 
 class VerifiedEmail:
+    """
+    VerifiedEmail holds the information about an email that was verified, like the if it's valid, or disposable
+    email address.
+    """
     def __init__(self, email, resp):
         self.email = email
         self._resp = resp
 
     def __str__(self):
+        """
+        :return: A string representation of VerifiedEmail.
+        """
         return '{}: {}'.format(self.email, self.result)
 
     @property
     def result_code(self):
         """
-        Return verification result code as an integer in range from 0 to 4.
-        :return: int
+        :return: An integer verification result code in range from 0 to 4.
         """
         return self._resp['result']
 
     @property
     def result(self):
         """
-        Return a text representation of verification result (eg. valid, invalid, disposable,...).
-        :return: str
+        :return: A string (textual) representation of verification result (eg. valid, invalid, disposable,...).
         """
         return RESULT_CODES[self.result_code]
 
     @property
     def is_valid(self):
         """
-        Return True if the email is valid.
-        :return: bool
+        :return: A boolean. True if the email is valid, false otherwise.
         """
         return self.result_code == 0
 
     @property
     def is_invalid(self):
         """
-        Return True if the email is invalid.
-        :return: bool
+        :return: A boolean. True if the email is invalid, false otherwise.
         """
         return self.result_code == 1
 
     @property
     def is_disposable(self):
         """
-        Return True if the email is disposable.
-        :return: bool
+        :return: A boolean. True if the email is disposable, false otherwise.
         """
         return self.result_code == 2
 
     @property
     def is_catchall(self):
         """
-        Return True if the email is catchall.
-        :return: bool
+        :return: A boolean. True if the email is catchall, false otherwise.
         """
         return self.result_code == 3
 
     @property
     def is_unknown(self):
         """
-        Return True if the email is unknown.
-        :return: bool
+        :return: A boolean. True if the email is unknown, false otherwise.
         """
         return self.result_code == 4
 
     @property
     def result_details_code(self):
         """
-        Return verification result details code as an integer in range from 0 to 1.
-        :return: int
+        :return: An integer verification details code (0 or 1).
         """
         return self._resp['result_details']
 
     @property
     def result_details(self):
         """
-        Return a text representation of verification details (eg. Provided email failed the syntax check).
-        :return: str
+        :return: A string (textual) representation of verification details (eg. Provided email failed the syntax check).
         """
         return RESULT_DETAILS_CODES[self.result_details_code]
