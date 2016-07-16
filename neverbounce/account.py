@@ -2,8 +2,10 @@ class Account:
     """
     Account class holds the information about NeverBounce account, eg. number of credits available, jobs completed, etc.
     """
-    def __init__(self, resp):
-        self._resp = resp
+    def __init__(self, credits, jobs_completed, jobs_processing):
+        self.credits = int(credits)
+        self.jobs_completed = int(jobs_completed)
+        self.jobs_processing = int(jobs_processing)
 
     def __str__(self):
         """
@@ -12,24 +14,3 @@ class Account:
         return 'credits: {}, jobs completed: {}, jobs processing: {}'.format(
             self.credits, self.jobs_completed, self.jobs_processing
         )
-
-    @property
-    def credits(self):
-        """
-        :return: An integer number of credits.
-        """
-        return int(self._resp['credits'])
-
-    @property
-    def jobs_completed(self):
-        """
-        :return: An integer number of completed jobs.
-        """
-        return int(self._resp['jobs_completed'])
-
-    @property
-    def jobs_processing(self):
-        """
-        :return: An integer number of processing jobs.
-        """
-        return int(self._resp['jobs_processing'])

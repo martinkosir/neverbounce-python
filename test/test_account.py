@@ -11,7 +11,7 @@ def account():
         'jobs_processing': '1',
         'execution_time': 0.021541651,
     }
-    return Account(resp)
+    return Account(resp['credits'], resp['jobs_completed'], resp['jobs_processing'])
 
 
 def test_account_str(account):
