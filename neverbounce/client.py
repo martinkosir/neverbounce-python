@@ -1,5 +1,5 @@
 import requests
-
+from json import JSONDecodeError
 from .exceptions import AccessTokenExpired, NeverBounceAPIError, InvalidResponseError
 from .email import VerifiedEmail, VerifiedBulkEmail
 from .account import Account
@@ -115,18 +115,19 @@ class NeverBounce:
         # Handle the download.
         if response.headers.get('Content-Type') == 'application/octet-stream':
             return response.content.decode('utf-8')
-        elif response.headers.get('Content-Type') == 'application/json':
-            resp = response.json()
+        else:
+            try:
+                resp = response.json()
+            except JSONDecodeError:
+                raise InvalidResponseError('Failed to handle the response content-type {}.'.format(
+                    response.headers.get('Content-Type'))
+                )
             if 'success' in resp and not resp['success']:
                 if 'msg' in resp and resp['msg'] == 'Authentication failed':
                     raise AccessTokenExpired
                 else:
                     raise NeverBounceAPIError(response)
             return resp
-        else:
-            raise InvalidResponseError('Failed to handle the response content-type {}.'.format(
-                response.headers.get('Content-Type'))
-            )
 
     def _parse_csv(self, csv):
         """

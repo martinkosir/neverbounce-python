@@ -58,6 +58,10 @@ def test_job_status_status_code(job_status):
     assert job_status.status_code == 4
 
 
+def test_job_status_is_completed(job_status):
+    assert job_status.is_completed
+
+
 def test_job_status_status(job_status):
     assert job_status.status == 'completed'
 

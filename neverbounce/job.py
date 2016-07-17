@@ -46,3 +46,7 @@ class JobStatus(Job):
 
     def __str__(self):
         return '{} job: {}'.format(self.status, self.job_id)
+
+    @property
+    def is_completed(self):
+        return self.status_code == 4
