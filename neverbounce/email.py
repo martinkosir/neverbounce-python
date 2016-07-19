@@ -9,7 +9,7 @@ RESULT_CODES = {
 RESULT_TEXT_CODES = {v: k for k, v in RESULT_CODES.items()}
 
 
-class Email:
+class Email(object):
     def __init__(self, email, result_code):
         self.email = email
         self.result_code = result_code

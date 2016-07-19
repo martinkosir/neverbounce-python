@@ -1,5 +1,4 @@
 import requests
-from json import JSONDecodeError
 from .exceptions import AccessTokenExpired, NeverBounceAPIError, InvalidResponseError
 from .email import VerifiedEmail, VerifiedBulkEmail
 from .account import Account
@@ -118,10 +117,10 @@ class NeverBounce:
         else:
             try:
                 resp = response.json()
-            except JSONDecodeError:
-                raise InvalidResponseError('Failed to handle the response content-type {}.'.format(
-                    response.headers.get('Content-Type'))
-                )
+            except ValueError:
+                 raise InvalidResponseError('Failed to handle the response content-type {}.'.format(
+                     response.headers.get('Content-Type'))
+                 )
             if 'success' in resp and not resp['success']:
                 if 'msg' in resp and resp['msg'] == 'Authentication failed':
                     raise AccessTokenExpired

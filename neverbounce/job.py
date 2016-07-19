@@ -17,7 +17,7 @@ TYPE_CODES = {
 }
 
 
-class Job:
+class Job(object):
     """
     Job class holds the information about NeverBounce bulk processing job.
     """
@@ -39,9 +39,9 @@ class JobStatus(Job):
         self.type = TYPE_CODES[self.type_code]
         self.stats = stats
         self.orig_name = orig_name
-        self.created = datetime.strptime(created, '%Y-%m-%d %H:%M:%S')
-        self.started = datetime.strptime(started, '%Y-%m-%d %H:%M:%S')
-        self.finished = datetime.strptime(finished, '%Y-%m-%d %H:%M:%S')
+        self._created = created
+        self._started = started
+        self._finished = finished
         super(JobStatus, self).__init__(job_id)
 
     def __str__(self):
@@ -74,3 +74,21 @@ class JobStatus(Job):
     @property
     def is_failed(self):
         return self.status_code == 5
+
+    @property
+    def created(self):
+        if self._created is None:
+            return
+        return datetime.strptime(self._created, '%Y-%m-%d %H:%M:%S')
+
+    @property
+    def started(self):
+        if self._started is None:
+            return
+        return datetime.strptime(self._started, '%Y-%m-%d %H:%M:%S')
+
+    @property
+    def started(self):
+        if self._finished is None:
+            return
+        return datetime.strptime(self._finished, '%Y-%m-%d %H:%M:%S')

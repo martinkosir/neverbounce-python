@@ -1,4 +1,6 @@
-from setuptools import setup, find_packages
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+from setuptools import setup
 
 with open('README.md', 'r') as f:
     readme = f.read()
@@ -19,6 +21,8 @@ setup(
         'Intended Audience :: Developers',
         'Topic :: Communications :: Email',
         'License :: OSI Approved :: MIT License',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
