@@ -58,8 +58,32 @@ def test_job_status_status_code(job_status):
     assert job_status.status_code == 4
 
 
+def test_job_status_is_uploading(job_status):
+    assert not job_status.is_uploading
+
+
+def test_job_status_is_received(job_status):
+    assert not job_status.is_received
+
+
+def test_job_status_is_parsing(job_status):
+    assert not job_status.is_parsing
+
+
+def test_job_status_is_parsed(job_status):
+    assert not job_status.is_parsed
+
+
+def test_job_status_is_running(job_status):
+    assert not job_status.is_running
+
+
 def test_job_status_is_completed(job_status):
     assert job_status.is_completed
+
+
+def test_job_status_is_failed(job_status):
+    assert not job_status.is_failed
 
 
 def test_job_status_status(job_status):

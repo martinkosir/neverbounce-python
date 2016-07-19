@@ -98,7 +98,7 @@ def test_create_job():
         responses.POST,
         BASE_URL + '/bulk',
         status=200,
-        content_type='application/json',
+        content_type='text/html',  # Really not cool
         json={
             'success': True,
             'job_status': 0,

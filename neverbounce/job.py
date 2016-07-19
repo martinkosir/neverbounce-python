@@ -48,5 +48,29 @@ class JobStatus(Job):
         return '{} job: {}'.format(self.status, self.job_id)
 
     @property
+    def is_uploading(self):
+        return self.status_code == -1
+
+    @property
+    def is_received(self):
+        return self.status_code == 0
+
+    @property
+    def is_parsing(self):
+        return self.status_code == 1
+
+    @property
+    def is_parsed(self):
+        return self.status_code == 2
+
+    @property
+    def is_running(self):
+        return self.status_code == 3
+
+    @property
     def is_completed(self):
         return self.status_code == 4
+
+    @property
+    def is_failed(self):
+        return self.status_code == 5
