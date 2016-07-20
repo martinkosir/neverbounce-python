@@ -88,7 +88,7 @@ class JobStatus(Job):
         return datetime.strptime(self._started, '%Y-%m-%d %H:%M:%S')
 
     @property
-    def started(self):
+    def finished(self):
         if self._finished is None:
             return
         return datetime.strptime(self._finished, '%Y-%m-%d %H:%M:%S')
