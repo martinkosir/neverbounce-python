@@ -5,7 +5,7 @@ from .account import Account
 from .job import Job, JobStatus
 
 
-class NeverBounce:
+class NeverBounce(object):
     """
     NeverBounce API client class used to verify an email address in realtime, check the account status, etc.
     """
@@ -33,7 +33,7 @@ class NeverBounce:
         resp = self._call('bulk', {'input_location': '1', 'input': '\n'.join(emails)})
         return Job(resp['job_id'])
 
-    def check_status(self, job_id):
+    def check_job(self, job_id):
         """
         Check the status of a bulk verification job.
         :param int job_id: ID of a job to check the status of.
@@ -43,7 +43,7 @@ class NeverBounce:
         return JobStatus(resp['id'], resp['status'], resp['type'], resp['stats'], resp['orig_name'],
                          resp['created'], resp['started'], resp['finished'])
 
-    def retrieve_results(self, job_id):
+    def retrieve_job(self, job_id):
         """
         Retrieve the results of a completed bulk verification job.
         :param int job_id: ID of a job to retrieve the results for.
@@ -111,7 +111,7 @@ class NeverBounce:
         """
         if not response.ok:
             raise NeverBounceAPIError(response)
-        # Handle the download.
+        # Handle the download response.
         if response.headers.get('Content-Type') == 'application/octet-stream':
             return response.content.decode('utf-8')
         else:

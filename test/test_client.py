@@ -114,7 +114,7 @@ def test_create_job():
 
 
 @responses.activate
-def test_check_status():
+def test_check_job():
     add_access_token_success_response()
     responses.add(
         responses.POST,
@@ -141,7 +141,7 @@ def test_check_status():
 
     )
     neverbounce = create_client()
-    job_status = neverbounce.check_status(123456)
+    job_status = neverbounce.check_job(123456)
     assert str(job_status) == 'completed job: 123456'
 
 
@@ -168,7 +168,7 @@ def test_create_job_bulk_not_allowed():
 
 
 @responses.activate
-def test_retrieve_results():
+def test_retrieve_job():
     add_access_token_success_response()
     responses.add(
         responses.POST,
@@ -178,5 +178,5 @@ def test_retrieve_results():
         body=b'john.doe@gmail.com,valid\nadmin@example.com,catchall\njane.doe@example.com,invalid\n'
     )
     neverbounce = create_client()
-    verified_emails = neverbounce.retrieve_results(56789)
+    verified_emails = neverbounce.retrieve_job(56789)
     assert [str(email) for email in verified_emails] == ['john.doe@gmail.com: valid', 'admin@example.com: catchall', 'jane.doe@example.com: invalid']

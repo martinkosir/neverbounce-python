@@ -1,7 +1,7 @@
-neverbounce-python
-==================
+NeverBounce
+===========
 
-Python library for the `NeverBounce API v3`_ — a real-time email
+Python API wrapper library for the `NeverBounce`_ email
 verification service.
 
 Usage
@@ -10,8 +10,8 @@ Usage
 `Sign up`_ to get an `API username and key`_ and 1000 free monthly
 verifications.
 
-A single email verification
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+A single verification
+~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: python
 
@@ -44,11 +44,11 @@ Bulk verification
     job_id = neverbounce.create_job(emails).job_id
 
     # Periodically poll for the verification results
-    job_status = neverbounce.check_status(job_id)
+    job_status = neverbounce.check_job(job_id)
 
     # Retrieve the results
     if job_status.is_completed:
-        verified_emails = neverbounce.retrieve_results(job_id)
+        verified_emails = neverbounce.retrieve_job(job_id)
         for email in verified_emails:
             print(str(email))
 
@@ -57,7 +57,7 @@ Documentation
 
 -  `Official docs for the NeverBounce RESTful API`_
 
-.. _NeverBounce API v3: https://neverbounce.com/
+.. _NeverBounce: https://neverbounce.com/
 .. _Sign up: https://app.neverbounce.com/register
 .. _API username and key: https://app.neverbounce.com/settings/api
 .. _Official docs for the NeverBounce RESTful API: https://docs.neverbounce.com/
