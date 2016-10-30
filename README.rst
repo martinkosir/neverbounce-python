@@ -88,3 +88,9 @@ Documentation
 .. _API username and key: https://app.neverbounce.com/settings/api
 .. _configure a payment method: https://app.neverbounce.com/settings/billing
 .. _Official docs for the NeverBounce RESTful API: https://docs.neverbounce.com/
+
+Build status
+------------
+
+.. image:: https://travis-ci.org/martinkosir/neverbounce-python.svg?branch=master
+    :target: https://travis-ci.org/martinkosir/neverbounce-python
