@@ -6,8 +6,7 @@ RESULT_CODES = {
     4: 'unknown'
 }
 
-
-RESULT_TEXT_CODES = dict((v, k) for (k, v) in RESULT_CODES.items())
+RESULT_TEXT_CODES = {v: k for k, v in RESULT_CODES.items()}
 
 
 class Email(object):
