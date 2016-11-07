@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import re
 from __future__ import unicode_literals
 from setuptools import setup
 from codecs import open
@@ -10,12 +9,7 @@ here = path.abspath(path.dirname(__file__))
 with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
 
-with open('neverbounce/__init__.py', 'r') as fd:
-    version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]',
-                        fd.read(), re.MULTILINE).group(1)
-
-if not version:
-    raise RuntimeError('Cannot find version information')
+version = __import__('neverbounce').__version__
 
 setup(
     name='neverbounce',
@@ -35,6 +29,7 @@ setup(
         'Intended Audience :: Developers',
         'Topic :: Communications :: Email',
         'License :: OSI Approved :: MIT License',
+        'Programming Language :: Python',
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
