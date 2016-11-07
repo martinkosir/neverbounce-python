@@ -1,19 +1,19 @@
 import requests
-from .exceptions import AccessTokenExpired, NeverBounceAPIError, InvalidResponseError
-from .email import VerifiedEmail, VerifiedBulkEmail
-from .account import Account
-from .job import Job, JobStatus
+import warnings
+from collections import namedtuple
+from neverbounce.exceptions import AccessTokenExpired, NeverBounceAPIError, InvalidResponseError
+from neverbounce.objects import Job, JobStatus, Account, VerifiedEmail
 
 
 class NeverBounce(object):
     """
-    NeverBounce API client class used to verify an email address in realtime, check the account status, etc.
+    NeverBounce API client used to verify an email address in realtime.
     """
     def __init__(self, api_username, api_key, base_url='https://api.neverbounce.com/v3'):
         self.api_username = api_username
         self.api_key = api_key
         self.base_url = base_url
-        self._access_token = None
+        self._cached_access_token = None
 
     def verify(self, email):
         """
@@ -21,7 +21,7 @@ class NeverBounce(object):
         :param str email: Email address to verify.
         :return: A VerifiedEmail object.
         """
-        resp = self._call('single', {'email': email})
+        resp = self._call(endpoint='single', data={'email': email})
         return VerifiedEmail(email, resp['result'])
 
     def create_job(self, emails):
@@ -30,64 +30,83 @@ class NeverBounce(object):
         :param list emails: Email addresses to verify.
         :return: A Job object.
         """
-        resp = self._call('bulk', {'input_location': '1', 'input': '\n'.join(emails)})
+        resp = self._call(endpoint='bulk', data={'input_location': '1', 'input': '\n'.join(emails)})
         return Job(resp['job_id'])
 
     def check_job(self, job_id):
         """
         Check the status of a bulk verification job.
         :param int job_id: ID of a job to check the status of.
-        :return: A Status object.
+        :return: A JobStatus object.
         """
-        resp = self._call('status', {'job_id': job_id})
-        return JobStatus(resp['id'], resp['status'], resp['type'], resp['stats'], resp['orig_name'],
-                         resp['created'], resp['started'], resp['finished'])
+        resp = self._call(endpoint='status', data={'job_id': job_id})
+        map = {'id': 'job_id', 'status': 'status_code', 'type': 'type_code'}
+        job_status_args = {map.get(k, k): v for k, v in resp.items()}
+        return JobStatus(**job_status_args)
+
+    def results(self, job_id):
+        """
+        Yield the result of a completed bulk verification job.
+        :param int job_id: ID of a job to retrieve the results for.
+        :yields: The next VerifiedEmail objects.
+        """
+        resp = self._call(endpoint='download', data={'job_id': job_id})
+        Row = namedtuple('Row', ['email', 'result_text_code'])
+        for line in resp:
+            row = Row(*line.decode('utf-8').split(','))
+            yield VerifiedEmail.from_text_code(row.email, row.result_text_code)
 
     def retrieve_job(self, job_id):
         """
-        Retrieve the results of a completed bulk verification job.
+        Result of a completed bulk verification job.
         :param int job_id: ID of a job to retrieve the results for.
-        :return: A list of VerifiedBulkEmail objects.
+        :return: A list of VerifiedEmail objects.
         """
-        resp = self._call('download', {'job_id': job_id})
-        return [VerifiedBulkEmail(d['email'], d['result_text_code']) for d in self._parse_csv(resp)]
+        warnings.warn('Use results generator method instead of retrieve_job which returns a list', UserWarning)
+        return list(self.results(job_id))
 
-    def check_account(self):
+    def account(self):
         """
-        Check the API account details like balance of credits.
+        Get the API account details like balance of credits.
         :return: An Account object.
         """
-        resp = self._call('account')
+        resp = self._call(endpoint='account')
         return Account(resp['credits'], resp['jobs_completed'], resp['jobs_processing'])
 
-    def get_access_token(self):
+    def check_account(self):
+        warnings.warn('check_account method is now called account', DeprecationWarning)
+        return self.account()
+
+    def access_token(self):
         """
-        Retrieve an access token to authenticate subsequential API calls.
+        Retrieve and cache an access token to authenticate API calls.
         :return: An access token string.
         """
-        if self._access_token:
-            return self._access_token
-        resp = self._request(
-            'access_token',
-            {'grant_type': 'client_credentials', 'scope': 'basic user'},
-            (self.api_username, self.api_key),
-        )
-        self._access_token = resp['access_token']
-        return self._access_token
+        if self._cached_access_token is not None:
+            return self._cached_access_token
+        resp = self._request(endpoint='access_token', data={'grant_type': 'client_credentials', 'scope': 'basic user'},
+                             auth=(self.api_username, self.api_key))
+        self._cached_access_token = resp['access_token']
+        return self._cached_access_token
 
-    def _call(self, endpoint, data={}):
+    def get_access_token(self):
+        warnings.warn('get_access_token method is now called access_token', DeprecationWarning)
+        return self.access_token()
+
+    def _call(self, endpoint, data=None):
         """
         Make an authorized API call to specified endpoint.
         :param str endpoint: API endpoint's relative URL, eg. `/account`.
         :param dict data: POST request data.
         :return: A dictionary or a string with response data.
         """
+        data = {} if data is None else data
         try:
-            data['access_token'] = self.get_access_token()
+            data['access_token'] = self.access_token()
             return self._request(endpoint, data)
         except AccessTokenExpired:
-            self._access_token = None
-            data['access_token'] = self.get_access_token()
+            self._cached_access_token = None
+            data['access_token'] = self.access_token()
             return self._request(endpoint, data)
 
     def _request(self, endpoint, data, auth=None):
@@ -102,40 +121,28 @@ class NeverBounce(object):
         response = requests.post(url, data, auth=auth)
         return self._handle_response(response)
 
-    def _handle_response(self, response):
+    @staticmethod
+    def _handle_response(response):
         """
         Handle the response and possible failures.
-        :param dict response: Response data.
+        :param Response response: Response data.
         :return: A dictionary or a string with response data.
         :raises: NeverBounceAPIError if the API call fails.
         """
         if not response.ok:
             raise NeverBounceAPIError(response)
-        # Handle the download response.
         if response.headers.get('Content-Type') == 'application/octet-stream':
-            return response.content.decode('utf-8')
-        else:
-            try:
-                resp = response.json()
-            except ValueError:
-                 raise InvalidResponseError('Failed to handle the response content-type {}.'.format(
-                     response.headers.get('Content-Type'))
-                 )
-            if 'success' in resp and not resp['success']:
-                if 'msg' in resp and resp['msg'] == 'Authentication failed':
-                    raise AccessTokenExpired
-                else:
-                    raise NeverBounceAPIError(response)
-            return resp
+            return response.iter_lines()
 
-    def _parse_csv(self, csv):
-        """
-        Parse the CSV with 2 columns (email, verification result).
-        :param str csv: CSV data to parse.
-        :return: A list of dictionaries.
-        """
-        data = []
-        for line in csv.strip().split('\n'):
-            cols = line.split(',')
-            data.append({'email': cols[0], 'result_text_code': cols[1]})
-        return data
+        try:
+            resp = response.json()
+        except ValueError:
+             raise InvalidResponseError('Failed to handle the response content-type {}.'.format(
+                 response.headers.get('Content-Type'))
+             )
+        if 'success' in resp and not resp['success']:
+            if 'msg' in resp and resp['msg'] == 'Authentication failed':
+                raise AccessTokenExpired
+            else:
+                raise NeverBounceAPIError(response)
+        return resp

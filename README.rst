@@ -27,19 +27,13 @@ Single verification
     >>> from neverbounce import NeverBounce
 
     >>> neverbounce = NeverBounce('my_api_username', 'my_api_key')
-    >>> verified_email = neverbounce.verify('some.email@example.com')
+    >>> verified = neverbounce.verify('martin@martinkosir.net')
 
-    >>> verified_email.result_text
-    'valid'
+    >>> print(str(verified))
+    martin@martinkosir.net: valid
 
-    >>> verified_email.result_code
-    0
-
-    >>> verified_email.is_valid
-    True
-
-    >>> str(verified_email)
-    'some.email@example.com: valid'
+    >>> print(verified.email, verified.result_text, verified.result_code, verified.is_valid)
+    martin@martinkosir.net valid 0 True
 
 Bulk verification
 ~~~~~~~~~~~~~~~~~
@@ -56,25 +50,41 @@ Create the job and get it's id:
 
 .. code::
 
-    >>> emails = ['some.email@example.com', 'john.doe@gmail.com']
+    >>> emails = ['some.email@example.com', 'john.smith@gmail.com']
     >>> job_id = neverbounce.create_job(emails).job_id
 
-Periodically poll for the verification job result:
+Periodically check the status of verification job:
 
 .. code::
 
     >>> job_status = neverbounce.check_job(job_id)
 
-Retrieve the result when the job is completed:
+Use the `results` generator to iterate over verified emails if the job has been completed:
 
 .. code::
 
     >>> if job_status.is_completed:
-    >>>     verified_emails = neverbounce.retrieve_job(job_id)
-    >>>     for email in verified_emails:
-    >>>         print(str(email))
-    'some.email@example.com: valid'
-    'john.doe@gmail.com: invalid'
+    ...     for verified in neverbounce.results(job_id):
+    ...         print(verified.email, verified.result_text, verified.result_code, verified.is_valid)
+    some.email@example.com invalid 1 False
+    john.smith@gmail.com invalid 1 False
+
+Account information
+~~~~~~~~~~~~~~~~~~~
+
+Get the information about your API account:
+
+.. code::
+
+    >>> from neverbounce import NeverBounce
+    >>> neverbounce = NeverBounce('my_api_username', 'my_api_key')
+    >>> account = neverbounce.account()
+
+    >>> print(str(account))
+    Credits: 999, Jobs Completed: 22, Jobs Processing: 0
+
+    >>> print(account.credits, account.jobs_completed, account.jobs_processing)
+    999 22 0
 
 Documentation
 -------------

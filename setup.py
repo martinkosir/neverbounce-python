@@ -18,7 +18,6 @@ setup(
     author_email='martin@martinkosir.net',
     packages=['neverbounce'],
     url='https://github.com/martinkosir/neverbounce-python',
-    download_url='https://github.com/martinkosir/neverbounce-python/tarball/{}'.format(version),
     license='MIT',
     description='API library for the NeverBounce email verification service.',
     long_description=long_description,
@@ -37,5 +36,5 @@ setup(
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
     ],
-    tests_require=['pytest>=3.0.0', 'responses>=0.5.0']
+    tests_require=['responses>=0.5.0']
 )
