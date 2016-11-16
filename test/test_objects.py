@@ -32,9 +32,9 @@ class VerifiedEmailTestCase(TestCase):
 
     def test_boolean_flag(self):
         for email_type, email in self.emails.items():
-            for type in VerifiedEmail.text_codes:
-                flag = 'is_{}'.format(type)
-                if email_type == type:
+            for code in VerifiedEmail.Codes:
+                flag = 'is_{}'.format(code.name)
+                if email_type == code.name:
                     self.assertTrue(getattr(email, flag))
                 else:
                     self.assertFalse(getattr(email, flag))
@@ -102,9 +102,9 @@ class JobStatusTestCase(TestCase):
         )
 
     def test_flags(self):
-        for status in JobStatus.statuses:
-            flag = 'is_{}'.format(status)
-            if self.job_status.status == status:
+        for status in JobStatus.Statuses:
+            flag = 'is_{}'.format(status.name)
+            if self.job_status.status == status.name:
                 self.assertTrue(getattr(self.job_status, flag))
             else:
                 self.assertFalse(getattr(self.job_status, flag))

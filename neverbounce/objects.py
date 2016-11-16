@@ -1,3 +1,4 @@
+from enum import Enum
 from datetime import datetime
 
 
@@ -6,10 +7,15 @@ class VerifiedEmail(object):
     VerifiedEmail holds the information about an email that was verified, like the if it's valid, or disposable
     email address.
     """
-    text_codes = ('valid', 'invalid', 'disposable', 'catchall', 'unknown')
-
-    result_codes = dict(zip(range(5), text_codes))
-    result_text_codes = dict(zip(text_codes, range(5)))
+    class Codes(Enum):
+        """
+        Enumeration of possible codes.
+        """
+        valid = 0
+        invalid = 1
+        disposable = 2
+        catchall = 3
+        unknown = 4
 
     def __init__(self, email, result_code):
         self.email = email
@@ -23,7 +29,7 @@ class VerifiedEmail(object):
         :param str result_text_code: A result of verification represented by text (e.g. valid, unknown).
         :return: An instance of object.
         """
-        result_code = cls.result_text_codes[result_text_code]
+        result_code = cls.Codes[result_text_code].value
         return cls(email, result_code)
 
     def __str__(self):
@@ -37,7 +43,7 @@ class VerifiedEmail(object):
         """
         :return: A string (textual) representation of the verification result (eg. valid, invalid, disposable,...).
         """
-        return self.result_codes[self.result_code]
+        return self.Codes(self.result_code).name
 
     @property
     def is_valid(self):
@@ -90,16 +96,31 @@ class JobStatus(object):
     """
     JobStatus class holds the information about NeverBounce bulk verification job status.
     """
-    statuses = ('uploading', 'received', 'parsing', 'parsed', 'running', 'completed', 'failed')
-    status_codes = dict(zip(range(-1, 6), statuses))
-    type_codes = {0: 'dashboard', 1: 'API'}
+    class Statuses(Enum):
+        """
+        Enumeration of possible job statuses.
+        """
+        uploading = -1
+        received = 0
+        parsing = 1
+        parsed = 2
+        running = 3
+        completed = 4
+        failed = 5
+
+    class Types(Enum):
+        """
+        Enumeration of possible job types.
+        """
+        dashboard = 0
+        API = 1
 
     def __init__(self, job_id, status_code, type_code, stats, orig_name, created, started, finished, **kwargs):
         self.job_id = int(job_id)
         self.status_code = int(status_code)
-        self.status = self.status_codes.get(self.status_code, '')
+        self.status = self.Statuses(self.status_code).name
         self.type_code = int(type_code)
-        self.type = self.type_codes.get(self.type_code, '')
+        self.type = self.Types(self.type_code).name
         self.stats = stats
         self.orig_name = orig_name
         self.created = datetime.strptime(created, '%Y-%m-%d %H:%M:%S') if created is not None else None
