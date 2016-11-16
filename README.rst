@@ -7,7 +7,7 @@ verification service.
 Installation
 ------------
 
-.. code::
+::
 
     $ pip install neverbounce
 
@@ -22,7 +22,7 @@ verifications. The **free account** supports only **single verifications**.
 Single verification
 ~~~~~~~~~~~~~~~~~~~
 
-.. code::
+.. code-block:: pycon
 
     >>> from neverbounce import NeverBounce
 
@@ -41,27 +41,27 @@ Bulk verification
 To use this features you need to `configure a payment method`_ in
 NeverBounce account settings.
 
-.. code::
+.. code-block:: pycon
 
     >>> from neverbounce import NeverBounce
     >>> neverbounce = NeverBounce('my_api_username', 'my_api_key')
 
 Create the job and get it's id:
 
-.. code::
+.. code-block:: pycon
 
     >>> emails = ['some.email@example.com', 'john.smith@gmail.com']
     >>> job_id = neverbounce.create_job(emails).job_id
 
 Periodically check the status of verification job:
 
-.. code::
+.. code-block:: pycon
 
     >>> job_status = neverbounce.check_job(job_id)
 
 Use the `results` generator to iterate over verified emails if the job has been completed:
 
-.. code::
+.. code-block:: pycon
 
     >>> if job_status.is_completed:
     ...     for verified in neverbounce.results(job_id):
@@ -74,7 +74,7 @@ Account information
 
 Get the information about your API account:
 
-.. code::
+.. code-block:: pycon
 
     >>> from neverbounce import NeverBounce
     >>> neverbounce = NeverBounce('my_api_username', 'my_api_key')
